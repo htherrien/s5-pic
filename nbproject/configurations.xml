@@ -16,6 +16,8 @@
       <itemPath>main.c</itemPath>
       <itemPath>config_bits.c</itemPath>
       <itemPath>LCD_SPI.c</itemPath>
+      <itemPath>commPIC_DSK.c</itemPath>
+      <itemPath>commPIC_DSK.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
