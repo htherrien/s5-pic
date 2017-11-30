@@ -57,12 +57,15 @@ int trameEnvoyeDSK = 0xAA; // Variable contenant la valeur de la tramme envoye a
      }
  }
  
-/* void interrupt myIsr(void)
+ void interrupt myIsr(void)
 {
      if(PIR1bits.RC1IF == 1) // Bit de flag indiquant que le buffer de reception UART est plein
      {
          flag_nouvelleTrameDSK = 1; 
+         trameRecueDSK = RCREG1;
+         RCREG1 = 0x00;
+         //PIR1bits.RC1IF = 0;
      }
-}*/
+}
  
  
