@@ -31,6 +31,7 @@ void configUART(void)
     // PPS-Lite configuration of GPIO pins to EUSART peripherial
     //RPINR0_1<7:4> = 0x60    --> RP26 = U1TX (output)
     //RPINR0_1<3:0> = 0x06    --> RP27 = U1RX (input)
+    RPINR0_1 &= 0x00;
     RPINR0_1 |= 0x66; 
     //RPOR26_27<7:4> = 0x10    --> U1TX = RP26 (output)
     //RPOR26_27<3:0> = 0x01    --> U1RX = RP27 (input)
@@ -40,7 +41,7 @@ void configUART(void)
     TRISDbits.TRISD6 = 0;   //TX set output
     TRISDbits.TRISD7 = 1;   //RX set input
 
-    // configuration communication RX
+    // configuration communication UART
     SPBRG1 = BAUDRATE;       // Set baud rate pour 115.2kBaud
     SPBRGH1 = 0;
     TXSTA1bits.BRGH = 1;     // High speed
@@ -55,20 +56,16 @@ void configUART(void)
 void configIntUART(void)
 {
     // configuration Interrupt
-    INTCONbits.GIE = 1;     // Enables all unmasked interrupts
     INTCONbits.PEIE = 1;    // Enables all unmasked peripheral interrupts
     PIE1bits.RC1IE = 1;     // Enables the EUSART1 receive interrupt
     //PIE1bits.TX1IE = 1;     // Enables the EUSART1 transmit interrupt
+    INTCONbits.GIE = 1;     // Enables all unmasked interrupts
 }
 
 
 void lectureTrameDSK(void)
 {
     trameRecueDSK = RCREG1; // Lie la valeur du buffer de reception
-    if(RCREG1)
-    {
-        putStringLCD("Bravo");
-    }
 }
 
 void ecrireDSK_UART(int trameEnvoye_DSK)
@@ -76,4 +73,8 @@ void ecrireDSK_UART(int trameEnvoye_DSK)
     //while(!TXSTA1bits.TRMT){}     // Attendre que l'écriture sois fini
     TXREG1 = trameEnvoye_DSK; // Ecrie dans le buffer d'envoie
     while(!TXSTA1bits.TRMT){}
+    if(PIR1bits.RC1IF == 1) // Bit de flag indiquant que le buffer de reception UART est plein
+     {
+         putStringLCD("Bob");
+     }
 }
