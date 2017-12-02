@@ -1,5 +1,5 @@
 /**************************************************************************
-Version 1.1
+Version 1.2
  
 Auteur : Danae Dufour-Forget, Franck Laouhap
 Date de création : 10/2017
@@ -14,25 +14,17 @@ Propriété : Les S de Sherbrooke
 // Librairies
 #include "LCD_SPI.h"
 #include "commPIC_DSK.h"
+#include "crc8.h"
+#include "accelerometre.h"
  
 //Variables
-int flag_nouvelleTrameDSK = 0; // Flag indiquant qu'une nouvelle tramme est arrive sur le DSK
-int flag_ecrireTrameDSK = 1; // Flag indiquant qu'une valeur est prete a etre ecrite au DSK
-int trameRecueDSK = 0; // Variable contenant la valeur de la tramme provenant du DSK
-int trameEnvoyeDSK = 0xAA; // Variable contenant la valeur de la tramme envoye au DSK
+#define trameEnvoyeDSK 0xAA // Variable contenant la valeur de la tramme envoye au DSK
 
  void main(void)
  {
-     unsigned char status = 0;
-     unsigned char data[5];
-     int i;
- 
-     // run internal oscillator at 8 MHz
-
-     
      initialisation_SPI();
      initialisation_PORT();
-     //OpenSPI(SPI_FOSC_16, MODE_00, SMPMID); //open SPI1
+     ComputeTableCRC8();
      
      //Configure la communication UART avec le DSK
      configPIC_DSK();
@@ -44,26 +36,20 @@ int trameEnvoyeDSK = 0xAA; // Variable contenant la valeur de la tramme envoye a
     putStringLCD("Hello world");
     while (1)
     {
-        if(flag_nouvelleTrameDSK)
-        {
-            lectureTrameDSK();
-            flag_nouvelleTrameDSK = 0;
-        }
-        else if (flag_ecrireTrameDSK)
-        {
-            ecrireDSK_UART(trameEnvoyeDSK);
-            //flag_ecrireTrameDSK = 0;
-        }
-     }
+        DonneeAccel donnee;
+        uint8_t* tamponEnvoiPtr;
+        
+        lireAccel(&donnee);
+        tamponEnvoiPtr = encoderAccel(&donnee);
+        ecrireMessageUART(tamponEnvoiPtr);
+    }
  }
  
  void interrupt myIsr(void)
 {
      if(PIR1bits.RC1IF == 1) // Bit de flag indiquant que le buffer de reception UART est plein
      {
-         flag_nouvelleTrameDSK = 1; 
-         trameRecueDSK = RCREG1;
-         RCREG1 = 0x00;
+          lectureCharUART();
          //PIR1bits.RC1IF = 0;
      }
 }

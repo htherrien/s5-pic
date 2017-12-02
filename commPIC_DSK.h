@@ -16,22 +16,20 @@ Propriété : Les S de Sherbrooke
 #define	COMMPIC_DSK_H
 
 #include <p18f67j94.h>
+#include "stdint.h"
+#include "messagesUART.h"
 
  //function prototypes
 void configPIC_DSK(void);
 void configUART(void);
 void configIntUART(void);
-void lectureTrameDSK(void);
-void ecrireDSK_UART(int trameEnvoye_DSK);
+unsigned char lectureCharUART(void);
+void ecrireCharUART(unsigned char trameEnvoye_DSK);
+int ecrireMessageUART(uint8_t message[]);
+uint8_t* encoderAccel(DonneeAccel* donnee);
 
  // Defines
 #define BAUDRATE 16 //Voir section 21: http://ww1.microchip.com/downloads/en/DeviceDoc/30000575C.pdf
-
-
-// Variables externes
-extern int trameRecueDSK;
-
-
 
 #ifdef	__cplusplus
 extern "C" {

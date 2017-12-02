@@ -5,7 +5,8 @@ Auteur : Hugo Daniel, Cedrik Maillette
 Date de cr√©ation : 29/11/2017
  
 Liste de modification:
-1. Modif√© par: NAME LASTNAME
+1. ModifiÈ par: Hugo Daniel, Cedrik Maillette
+2. ModifiÈ par: Hugo Therrien
  
 Description : Fonctions en rapport avec la communication PIC DSK
 Propri√©t√© : Les S de Sherbrooke
@@ -17,8 +18,6 @@ Propri√©t√© : Les S de Sherbrooke
 #include "LCD_SPI.h"
 
 // Variables 
-
-
 
 void configPIC_DSK(void)
 {
@@ -63,18 +62,32 @@ void configIntUART(void)
 }
 
 
-void lectureTrameDSK(void)
+unsigned char lectureCharUART(void)
 {
-    trameRecueDSK = RCREG1; // Lie la valeur du buffer de reception
+    unsigned char trameRecueDSK = RCREG1; // Lie la valeur du buffer de reception
+    RCREG1 = 0x00; //POURQUOI? Descendre le flag RCIF1 je pense
+    return trameRecueDSK;
 }
 
-void ecrireDSK_UART(int trameEnvoye_DSK)
+void ecrireCharUART(unsigned char caractere)
 {
-    //while(!TXSTA1bits.TRMT){}     // Attendre que l'Ècriture sois fini
-    TXREG1 = trameEnvoye_DSK; // Ecrie dans le buffer d'envoie
-    while(!TXSTA1bits.TRMT){}
+    while(!TXSTA1bits.TRMT){}     // Attendre que l'Ècriture sois fini
+    TXREG1 = caractere; // Ecrit dans le buffer d'envoi
+    /*
     if(PIR1bits.RC1IF == 1) // Bit de flag indiquant que le buffer de reception UART est plein
      {
          putStringLCD("Bob");
      }
+    */
+}
+
+int ecrireMessageUART(uint8_t message[])
+{
+    int index = 0;
+    do
+    {
+        while(!TXSTA1bits.TRMT){};
+        TXREG1 = message[index];
+        index++;
+    }while(message[index]);
 }
