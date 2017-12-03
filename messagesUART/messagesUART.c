@@ -8,8 +8,10 @@ Description : Fichier de décodage et d'encodage des messages
 Propriété Les S de Sherbrooke
 **************************************************************************/
 
-#include "accelerometre.h"
+#include "messagesUART.h"
 #include "cobs.h"
+#include "crc8.h"
+#include "assert.h"
 
 #define TAILLE_TAMPON_ENVOI 32
 #define TAILLE_TAMPON_RECEPTION TAILLE_TAMPON_ENVOI
@@ -26,17 +28,30 @@ uint8_t* encoderAccel(DonneeAccel* donnee)
     return tamponEnvoi;
 }
 
-void decoderMessage(uint8_t* message)
+uint8_t* encoderAccelCRC(DonneeAccelCRC* donnee)
 {
-    uint8_t header = message[1];
+    donnee->header = MESSAGE_ACCEL_CRC;
+    donnee->crc8 = ComputeCRC8((uint8_t*) donnee, TAILLE_MESSAGE_ACCEL);
+    cobsEncode((uint8_t *)donnee, TAILLE_MESSAGE_ACCEL_CRC, tamponEnvoi);
+    return tamponEnvoi;
+}
+
+void decoderMessage(uint8_t* message, uint8_t taille)
+{
+    uint8_t header;
+    assert(taille < TAILLE_TAMPON_RECEPTION);
+    cobsDecode(message, taille, tamponReception);
+    header = tamponReception[0];
+
     switch(header)
     {
         case MESSAGE_ACCEL:
+        {
             DonneeAccel* accelDecode;
-            cobsDecode(message, TAILLE_MESSAGE_ACCEL + COBS_OVERHEAD, tamponReception);
             accelDecode = (DonneeAccel*)(&tamponReception[1]);
             // appeler la fonction appropriée
             break;
+        }
         default:
             break;
     }
