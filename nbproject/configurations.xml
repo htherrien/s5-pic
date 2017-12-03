@@ -4,12 +4,16 @@
     <logicalFolder name="HeaderFiles"
                    displayName="Header Files"
                    projectFiles="true">
+      <logicalFolder name="messagesUARt"
+                     displayName="messagesUART"
+                     projectFiles="true">
+        <itemPath>messagesUARt/cobs.h</itemPath>
+        <itemPath>messagesUARt/crc8.h</itemPath>
+        <itemPath>messagesUARt/messagesUART.h</itemPath>
+      </logicalFolder>
       <itemPath>LCD_SPI.h</itemPath>
       <itemPath>commPIC_DSK.h</itemPath>
-      <itemPath>cobs.h</itemPath>
-      <itemPath>crc8.h</itemPath>
       <itemPath>accelerometre.h</itemPath>
-      <itemPath>messagesUART.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -18,14 +22,18 @@
     <logicalFolder name="SourceFiles"
                    displayName="Source Files"
                    projectFiles="true">
+      <logicalFolder name="messagesUART"
+                     displayName="messagesUART"
+                     projectFiles="true">
+        <itemPath>messagesUART/cobs.c</itemPath>
+        <itemPath>messagesUART/crc8.c</itemPath>
+        <itemPath>messagesUART/messagesUART.c</itemPath>
+      </logicalFolder>
       <itemPath>main.c</itemPath>
       <itemPath>config_bits.c</itemPath>
       <itemPath>LCD_SPI.c</itemPath>
       <itemPath>commPIC_DSK.c</itemPath>
-      <itemPath>cobs.c</itemPath>
-      <itemPath>crc8.c</itemPath>
       <itemPath>accelerometre.c</itemPath>
-      <itemPath>messagesUART.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
