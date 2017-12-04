@@ -16,25 +16,33 @@ extern "C" {
 #define MESSAGE_ACCEL_CRC 0x81
 
 #include <stdint.h>
-    
+
+#define TAILLE_EXTRA_COBS_ENCODE 1
+#define TAILLE_EXTRA_COBS_DECODE 2
+
 typedef struct DonneeAccel
 {
     uint8_t header;
-    uint16_t x;
-    uint16_t y;
-    uint16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
 }DonneeAccel;
+#define TAILLE_MESSAGE_ACCEL 7
 
 typedef struct DonneeAccelCRC
 {
     uint8_t header;
-    uint16_t x;
-    uint16_t y;
-    uint16_t z;
+    int16_t x;
+    int16_t y;
+    int16_t z;
     uint8_t crc8;
 }DonneeAccelCRC;
+
+#define TAILLE_MESSAGE_ACCEL_CRC 8
     
 uint8_t* encoderAccel(DonneeAccel* donnee);
+
+void decoderMessage(uint8_t* message, uint8_t taille);
 
 #ifdef	__cplusplus
 }
