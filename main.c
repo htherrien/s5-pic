@@ -14,8 +14,8 @@ Propriété : Les S de Sherbrooke
 // Librairies
 #include "LCD_SPI.h"
 #include "commPIC_DSK.h"
-#include "crc8.h"
-#include "accelerometre.h"
+#include "I2C.h"
+#include "messagesUART/messagesUART.h"
  
 //Variables
 #define trameEnvoyeDSK 0xAA // Variable contenant la valeur de la tramme envoye au DSK
@@ -24,24 +24,32 @@ Propriété : Les S de Sherbrooke
  {
      initialisation_SPI();
      initialisation_PORT();
+     I2CInitialisation();
      ComputeTableCRC8();
      
      //Configure la communication UART avec le DSK
      configPIC_DSK();
-
      
     while(readBusyFlag());
     clearDisplay();
     displayCtrl(1,1,0);
     putStringLCD("Hello world");
+    
+    
     while (1)
     {
+        uint8_t buf[6];
         DonneeAccel donnee;
         uint8_t* tamponEnvoiPtr;
+        MPUReadBytes(buf, capteurXregH, 6);
         
-        lireAccel(&donnee);
+        donnee.x = ((uint16_t)buf[0] << 8) + buf[1];
+        donnee.y = ((uint16_t)buf[2] << 8) + buf[3];
+        donnee.z = ((uint16_t)buf[4] << 8) + buf[5];
+        
         tamponEnvoiPtr = encoderAccel(&donnee);
-        ecrireMessageUART(tamponEnvoiPtr);
+        //ecrireMessageUART(tamponEnvoiPtr);
+        ecrireMessageUART("test");
     }
  }
  

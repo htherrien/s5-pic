@@ -17,7 +17,7 @@ Propriété : Les S de Sherbrooke
 
 #include <p18f67j94.h>
 #include "stdint.h"
-#include "messagesUART.h"
+#include "messagesUART/messagesUART.h"
 
  //function prototypes
 void configPIC_DSK(void);

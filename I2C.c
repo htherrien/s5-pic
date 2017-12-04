@@ -8,9 +8,9 @@
 
 
 #include "I2C.h"
-uint8_t initialisation(void)
+uint8_t I2CInitialisation(void)
 {
-    
+    OpenI2C(MASTER, SLEW_OFF);
     uint8_t valeur;
     SSP1ADD = 19; // Set the Baud rate for a master use
     
