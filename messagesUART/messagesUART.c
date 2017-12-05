@@ -22,15 +22,15 @@ static uint8_t tamponDecodage[TAILLE_TAMPON_DECODAGE] = {0};
 uint8_t* encoderAccel(DonneeAccel* donnee)
 {   
     donnee->header = MESSAGE_ACCEL;
-    cobsEncode((uint8_t *)donnee, TAILLE_MESSAGE_ACCEL + TAILLE_EXTRA_COBS_ENCODE, tamponEncodage);
+    cobsEncode((uint8_t *)donnee, TAILLE_MESSAGE_ACCEL, tamponEncodage);
     return tamponEncodage;
 }
 
 uint8_t* encoderAccelCRC(DonneeAccelCRC* donnee)
 {
     donnee->header = MESSAGE_ACCEL_CRC;
-    donnee->crc8 = ComputeCRC8((uint8_t*) donnee, TAILLE_MESSAGE_ACCEL + 1);
-    cobsEncode((uint8_t *)donnee, TAILLE_MESSAGE_ACCEL_CRC + TAILLE_EXTRA_COBS_ENCODE, tamponEncodage);
+    donnee->crc8 = ComputeCRC8((uint8_t*) donnee, TAILLE_MESSAGE_ACCEL_CRC);
+    cobsEncode((uint8_t *)donnee, TAILLE_MESSAGE_ACCEL_CRC + 1, tamponEncodage);
     return tamponEncodage;
 }
 
