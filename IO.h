@@ -15,7 +15,7 @@ extern "C" {
 #include <stdio.h>
  //function prototypes
  void InitialisationIO(void);
- void allumeLED(int DELR, int DELV, int DELJ);
+ void allumeLEDRVJ(int DELR, int DELV, int DELJ);
     
  //Variables
     

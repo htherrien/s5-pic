@@ -14,6 +14,7 @@
       <itemPath>LCD_SPI.h</itemPath>
       <itemPath>commPIC_DSK.h</itemPath>
       <itemPath>I2C.h</itemPath>
+      <itemPath>IO.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -34,6 +35,7 @@
       <itemPath>LCD_SPI.c</itemPath>
       <itemPath>commPIC_DSK.c</itemPath>
       <itemPath>I2C.c</itemPath>
+      <itemPath>IO.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -54,7 +56,7 @@
         <targetPluginBoard></targetPluginBoard>
         <platformTool>PICkit3PlatformTool</platformTool>
         <languageToolchain>XC8</languageToolchain>
-        <languageToolchainVersion>1.34</languageToolchainVersion>
+        <languageToolchainVersion>1.38</languageToolchainVersion>
         <platform>3</platform>
       </toolsSet>
       <compileType>
