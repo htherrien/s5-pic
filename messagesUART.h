@@ -22,23 +22,23 @@ extern "C" {
 
 typedef struct DonneeAccel
 {
-    uint8_t header;
+    int16_t header;
     int16_t x;
     int16_t y;
     int16_t z;
 }DonneeAccel;
-#define TAILLE_MESSAGE_ACCEL 7
+#define TAILLE_MESSAGE_ACCEL sizeof(DonneeAccel)
 
 typedef struct DonneeAccelCRC
 {
-    uint8_t header;
+    int16_t header;
     int16_t x;
     int16_t y;
     int16_t z;
-    uint8_t crc8;
+    int16_t crc8;
 }DonneeAccelCRC;
 
-#define TAILLE_MESSAGE_ACCEL_CRC 8
+#define TAILLE_MESSAGE_ACCEL_CRC sizeof(DonneeAccelCRC)
     
 uint8_t* encoderAccel(DonneeAccel* donnee);
 
