@@ -48,8 +48,7 @@ Propriété : Les S de Sherbrooke
         donnee.z = ((uint16_t)buf[4] << 8) + buf[5];
         
         tamponEnvoiPtr = encoderAccel(&donnee);
-        //ecrireMessageUART(tamponEnvoiPtr);
-        ecrireMessageUART("test");
+        ecrireMessageUART(tamponEnvoiPtr);
     }
  }
  

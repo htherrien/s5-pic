@@ -48,8 +48,8 @@ void configUART(void)
     RCSTA1bits.SPEN = 1;     // Serial port is enabled
     RCSTA1bits.CREN = 1;     // Enables receiver
     BAUDCON1bits.BRG16 = 1;  // 16-bit Baud Rate Generator 
-   
-    
+    BAUDCON1bits.RXDTP1 = 1; // RX active low
+    BAUDCON1bits.TXCKP1 = 1; // TX idle low    
 }
 
 void configIntUART(void)
@@ -84,10 +84,13 @@ void ecrireCharUART(unsigned char caractere)
 int ecrireMessageUART(uint8_t message[])
 {
     int index = 0;
-    do
+    while(message[index])
     {
         while(!TXSTA1bits.TRMT){};
         TXREG1 = message[index];
         index++;
-    }while(message[index]);
+    }
+    while(!TXSTA1bits.TRMT){};
+    TXREG1 = message[index];
+    return index;
 }
