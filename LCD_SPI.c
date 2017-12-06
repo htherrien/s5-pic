@@ -70,6 +70,7 @@
    
  }
  
+ 
  unsigned char readBusyFlag()
  {
         unsigned char retValue;
@@ -125,3 +126,4 @@
      __delay_ms(33); //wait 100 ms for the LCD to power itself on properly
      __delay_ms(33); //wait 100 ms for the LCD to power itself on properly
  }
+

@@ -39,6 +39,7 @@ void InitialisationIntI2C(void)
     INTCONbits.TMR0IF = 0; // Descend le flag TMR0
     INTCONbits.TMR0IE = 1; // Enable 
     INTCONbits.GIE = 1;
+    
 }
 uint8_t WHOAMI(void)
 {

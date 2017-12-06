@@ -20,6 +20,7 @@ PropriÃ©tÃ© : Les S de Sherbrooke
  
 //Defines
 #define trameEnvoyeDSK 0xAA // Variable contenant la valeur de la tramme envoye au DSK
+int test = 0;
 
 //Variables globale
 char ValeurReussi = 0x69; // Valeur qui indique q'une correlation a ete reussite
@@ -44,24 +45,25 @@ int modeCorrelation = 0;    // Active le mode Correlation
     clearDisplay();
     displayCtrl(1,1,0);
     putStringLCD("Bonjour");
+    test = 0;
     InitialisationIO();         // Initialisation I/O PORTs
     
     while (1)
     {    
         if(PORTGbits.RG4==1)    //switch fermée
         {
-            LATCbits.LATC6 = 0;  //Close LED Verte
-            LATCbits.LATC5 = 0;  //Close LED Rouge
-            LATCbits.LATC2 = 0;  //Close LED jaune
             while(readBusyFlag());
             clearDisplay();
             putStringLCD("Pause");     // LCD affiche le mode pause
+            LATCbits.LATC6 = 0;  //Close LED Verte
+            LATCbits.LATC5 = 0;  //Close LED Rouge
+            LATCbits.LATC2 = 0;  //Close LED jaune
         } 
         else
         {
             LATCbits.LATC6 = 1;  //Open LED Verte
             
-        //SECTION COMMUNICATION INPUT DSK
+            //SECTION COMMUNICATION INPUT DSK
             if(donneeDSK_ready)
             {
                 if(ValeurReussi == trameRecue_DSK && modeCorrelation == 1)
@@ -84,10 +86,11 @@ int modeCorrelation = 0;    // Active le mode Correlation
             {
                 while(readBusyFlag());
                 clearDisplay();
-                putStringLCD("Mode Curseur");   // LCD affiche le mode       
+                putStringLCD("Curseur");   // LCD affiche le mode       
                 modeCorrelation = 0;            // Mode Curseur activé
                 LATCbits.LATC5 = 1;  //Open LED Rouge
                 LATCbits.LATC2 = 0;  //Close LED jaune
+                while(readBusyFlag());
             }  
                
             //SECTION LECTURE MPU6050
