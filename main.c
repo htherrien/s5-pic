@@ -28,6 +28,7 @@ int readI2C_flag = 0; // Flag qui indique de commencer une lecture I2C
 int donneeDSK_ready = 0; // Flag indiquant qu'une donnee venant du DSK a ete lue
 unsigned char trameRecue_DSK = 0; // Trame recue du DSK;
 int modeCorrelation = 0;    // Active le mode Correlation
+int modeAffichageFlag = 0;    // Active l'affichage
 
 
  void main(void)
@@ -77,20 +78,27 @@ int modeCorrelation = 0;    // Active le mode Correlation
         //SECTION COMMUNICATION OUTPUT DSK
             if(PORTGbits.RG3==0)     //bouton
             {
-                while(readBusyFlag());
-                clearDisplay();
-                putStringLCD("Mode Correlation");   // LCD affiche le mode
+                if(modeAffichageFlag == 1)
+                {
+                    while(readBusyFlag());
+                    clearDisplay();
+                    putStringLCD("Mode Correlation");   // LCD affiche le mode
+                }
                 modeCorrelation = 1;                // Mode Correlation activé
+                modeAffichageFlag = 0;              // Afficher le mode
             }  
             if(PORTGbits.RG3==1)     //bouton
             {
-                while(readBusyFlag());
-                clearDisplay();
-                putStringLCD("Curseur");   // LCD affiche le mode       
+                if(modeAffichageFlag == 0)
+                {
+                    while(readBusyFlag());
+                    clearDisplay();
+                    putStringLCD("Mode Curseur");   // LCD affiche le mode
+                }
                 modeCorrelation = 0;            // Mode Curseur activé
+                modeAffichageFlag = 1;          // Afficher le mode
                 LATCbits.LATC5 = 1;  //Open LED Rouge
                 LATCbits.LATC2 = 0;  //Close LED jaune
-                while(readBusyFlag());
             }  
                
             //SECTION LECTURE MPU6050
