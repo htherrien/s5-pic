@@ -9,6 +9,7 @@
 #include <stdio.h>
  //function prototypes
   uint8_t I2CInitialisation(void);
+  void InitialisationIntI2C(void);
   int I2CReadSeq(void);
   uint8_t WHOAMI(void);
   void MPUReadBytes(uint8_t buffer[], uint8_t registre, int taille);

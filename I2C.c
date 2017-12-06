@@ -24,6 +24,22 @@ uint8_t I2CInitialisation(void)
    return valeur;
 
 }
+
+void InitialisationIntI2C(void)
+{
+    // Initialise l'interuption qui indicte au compilateur qu'il faut faire une lecture I2C
+    
+    // Initialisation de l'horloge Timer0 
+    TMR0L = 0xFF;		//chargement du compte LSB
+    TMR0H = 0xFF;		//chargement du compte MSB
+    T0CON = 0xD3;         //PRESCALER VALUE: Sert à initialiser la fréquence d'échantillonnage 
+    T0CONbits.TMR0ON=1;    // mise en route de l'horloge
+
+    // initialisation des interruptions
+    INTCONbits.TMR0IF = 0; // Descend le flag TMR0
+    INTCONbits.TMR0IE = 1; // Enable 
+    INTCONbits.GIE = 1;
+}
 uint8_t WHOAMI(void)
 {
 
