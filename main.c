@@ -29,14 +29,15 @@ int donneeDSK_ready = 0; // Flag indiquant qu'une donnee venant du DSK a ete lue
 unsigned char trameRecue_DSK = 0; // Trame recue du DSK;
 int modeCorrelation = 0;    // Active le mode Correlation
 int modeAffichageFlag = 0;    // Active l'affichage
-
+int pauseFlag = 0;    // Active l'affichage
+int reussi=0;
 
  void main(void)
  {
      //Fonctions d'initialisation
      initialisation_SPI();      // Initialisation SPI
      initialisation_PORT();     // Initialisation PORTs
-     I2CInitialisation();       // Initialisation I2C
+     reussi=I2CInitialisation();       // Initialisation I2C
      ComputeTableCRC8();
      InitialisationIntI2C();    // Initialisation interrup I2C
      configPIC_DSK();           // configuration UART
@@ -53,15 +54,21 @@ int modeAffichageFlag = 0;    // Active l'affichage
     {    
         if(PORTGbits.RG4==1)    //switch fermée
         {
+             if(pauseFlag == 1)
+             {
             while(readBusyFlag());
             clearDisplay();
             putStringLCD("Pause");     // LCD affiche le mode pause
+             }
+            pauseFlag = 0;
+            modeAffichageFlag = 0;              // Afficher le mode
             LATCbits.LATC6 = 0;  //Close LED Verte
             LATCbits.LATC5 = 0;  //Close LED Rouge
             LATCbits.LATC2 = 0;  //Close LED jaune
         } 
         else
         {
+            pauseFlag = 1;
             LATCbits.LATC6 = 1;  //Open LED Verte
             
             //SECTION COMMUNICATION INPUT DSK
