@@ -70,12 +70,6 @@ int modeCorrelation = 0;    // Active le mode Correlation
                     LATCbits.LATC2 = 1;  //Open LED jaune
                     trameRecue_DSK = 0;  //Prêt pour une autre trame
                 }
-                 /*if(ValeurReussi != trameRecue_DSK && modeCorrelation == 1)
-                {
-                    flag_corrRate = 1;
-                    LATCbits.LATC5 = 1;  //Open LED Rouge
-                    LATCbits.LATC2 = 0;  //Close LED jaune
-                }*/
             }
         
         //SECTION COMMUNICATION OUTPUT DSK
@@ -107,6 +101,14 @@ int modeCorrelation = 0;    // Active le mode Correlation
                 donnee.x = ((uint16_t)buf[0] << 8) + buf[1];
                 donnee.y = ((uint16_t)buf[2] << 8) + buf[3];
                 donnee.z = ((uint16_t)buf[4] << 8) + buf[5];
+                if(modeCorrelation)
+                {
+                    donnee.mode = MODE_CORRELATION;
+                }
+                else
+                {
+                    donnee.mode = MODE_SOURIS;
+                }
 
                 tamponEnvoiPtr = encoderAccel(&donnee);
                 ecrireMessageUART(tamponEnvoiPtr);
