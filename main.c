@@ -20,10 +20,11 @@ PropriÃ©tÃ© : Les S de Sherbrooke
  
 //Defines
 #define trameEnvoyeDSK 0xAA // Variable contenant la valeur de la tramme envoye au DSK
-int test = 0;
+int test =99;
 
 //Variables globale
 char ValeurReussi = 0x69; // Valeur qui indique q'une correlation a ete reussite
+int resultat_corr = 0;
 int readI2C_flag = 0; // Flag qui indique de commencer une lecture I2C
 int donneeDSK_ready = 0; // Flag indiquant qu'une donnee venant du DSK a ete lue
 unsigned char trameRecue_DSK = 0; // Trame recue du DSK;
@@ -41,13 +42,12 @@ int reussi=0;
      ComputeTableCRC8();
      InitialisationIntI2C();    // Initialisation interrup I2C
      configPIC_DSK();           // configuration UART
-
      
     while(readBusyFlag());
     clearDisplay();
     displayCtrl(1,1,0);
+    moveCursor(1,2);
     putStringLCD("Bonjour");
-    test = 0;
     InitialisationIO();         // Initialisation I/O PORTs
     
     while (1)
@@ -58,6 +58,7 @@ int reussi=0;
              {
             while(readBusyFlag());
             clearDisplay();
+            moveCursor(1,2);
             putStringLCD("Pause");     // LCD affiche le mode pause
              }
             pauseFlag = 0;
@@ -70,17 +71,6 @@ int reussi=0;
         {
             pauseFlag = 1;
             LATCbits.LATC6 = 1;  //Open LED Verte
-            
-            //SECTION COMMUNICATION INPUT DSK
-            if(donneeDSK_ready)
-            {
-                if(ValeurReussi == trameRecue_DSK && modeCorrelation == 1)
-                {
-                    LATCbits.LATC5 = 0;  //Close LED Rouge
-                    LATCbits.LATC2 = 1;  //Open LED jaune
-                    trameRecue_DSK = 0;  //Prêt pour une autre trame
-                }
-            }
         
         //SECTION COMMUNICATION OUTPUT DSK
             if(PORTGbits.RG3==0)     //bouton
@@ -90,9 +80,53 @@ int reussi=0;
                     while(readBusyFlag());
                     clearDisplay();
                     putStringLCD("Mode Correlation");   // LCD affiche le mode
+                    
+/************************************************************/   
+/*                    AFFICHAGE RÉSULTAT                    */                                       
+/************************************************************/ 
+                   if(resultat_corr < 90 || resultat_corr > 100)
+                   {
+                      
+                      moveCursor(1,1);
+                      putStringLCD("similarite:");
+                      moveCursor(1,13);
+                      putNumberLCD(resultat_corr);
+                      if(resultat_corr < 1 || resultat_corr > 100)
+                      {
+                        putStringLCD("0%");  
+                      }
+                      else
+                      {
+                      putNumberLCD(resultat_corr);
+                      putStringLCD("%");
+                      }
+                      moveCursor(2,1);
+                      clearRow(2);
+                      putStringLCD("Mouvement inconnu");  
+                      
+                   }
+                   else 
+                   {
+                      moveCursor(1,1);
+                      putStringLCD("similarite:");
+                      moveCursor(1,13);
+                      putNumberLCD(resultat_corr);
+                      putStringLCD("%");
+                      moveCursor(2,1);
+                      clearRow(2);
+                      putStringLCD("Mouvement reussi");  
+                   }
+/************************************************************/   
+/*                 FIN AFFICHAGE RÉSULTAT                   */                                       
+/************************************************************/ 
+                    
                 }
                 modeCorrelation = 1;                // Mode Correlation activé
                 modeAffichageFlag = 0;              // Afficher le mode
+                //SECTION COMMUNICATION INPUT DSK
+                LATCbits.LATC5 = 0;  //Close LED Rouge
+                LATCbits.LATC2 = 1;  //Open LED jaune
+                trameRecue_DSK = 0;  //Prêt pour une autre trame
             }  
             if(PORTGbits.RG3==1)     //bouton
             {
@@ -100,6 +134,7 @@ int reussi=0;
                 {
                     while(readBusyFlag());
                     clearDisplay();
+                    moveCursor(1,2);
                     putStringLCD("Mode Curseur");   // LCD affiche le mode
                 }
                 modeCorrelation = 0;            // Mode Curseur activé
@@ -136,14 +171,15 @@ int reussi=0;
     }
 }
          
-
  
  void interrupt myIsr(void)
 {
      if(PIR1bits.RC1IF == 1) // Bit de flag indiquant que le buffer de reception UART est plein
      {
          trameRecue_DSK = lectureCharUART();
+         resultat_corr = trameRecue_DSK;
          donneeDSK_ready = 1; // Donnee du DSK lue
+         
      }
      if(INTCONbits.TMR0IE && INTCONbits.TMR0IF) 
      { 
