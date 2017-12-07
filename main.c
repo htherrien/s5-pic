@@ -63,7 +63,8 @@ int reussi=0;
             putStringLCD("Pause");     // LCD affiche le mode pause
              }
             pauseFlag = 0;
-            modeAffichageFlag = 0;              // Afficher le mode
+            modeCurseurAffichage = 0;
+            modeCorrelationAffichage = 0;
             LATCbits.LATC6 = 0;  //Close LED Verte
             LATCbits.LATC5 = 0;  //Close LED Rouge
             LATCbits.LATC2 = 0;  //Close LED jaune
@@ -76,8 +77,9 @@ int reussi=0;
         //SECTION COMMUNICATION OUTPUT DSK
             if(PORTGbits.RG3==0)     //bouton
             {
-                if(modeAffichageFlag == 1)
+                if(modeCorrelationAffichage == 0)
                 {
+                    modeCorrelationAffichage = 1;
                     while(readBusyFlag());
                     clearDisplay();
                     putStringLCD("Mode Correlation");   // LCD affiche le mode
@@ -121,7 +123,8 @@ int reussi=0;
 /************************************************************/ 
                     
                 }
-                modeCorrelation = 1;                // Mode Correlation activ鍊                modeAffichageFlag = 0;              // Afficher le mode
+                modeCorrelation = 1;                // Mode Correlation activ鍊
+                modeCurseurAffichage = 0;
                 //SECTION COMMUNICATION INPUT DSK
                 LATCbits.LATC5 = 0;  //Close LED Rouge
                 LATCbits.LATC2 = 1;  //Open LED jaune
@@ -129,14 +132,16 @@ int reussi=0;
             }  
             if(PORTGbits.RG3==1)     //bouton
             {
-                if(modeAffichageFlag == 0)
+                if(modeCurseurAffichage == 0)
                 {
                     while(readBusyFlag());
                     clearDisplay();
                     moveCursor(1,2);
                     putStringLCD("Mode Curseur");   // LCD affiche le mode
+                    modeCurseurAffichage = 1;
                 }
-                modeCorrelation = 0;            // Mode Curseur activ鍊                modeAffichageFlag = 1;          // Afficher le mode
+                modeCorrelationAffichage = 0;
+                modeCorrelation = 0;            // Mode Curseur activ鍊
                 LATCbits.LATC5 = 1;  //Open LED Rouge
                 LATCbits.LATC2 = 0;  //Close LED jaune
             }   
