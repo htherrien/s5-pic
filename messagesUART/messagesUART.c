@@ -34,14 +34,24 @@ uint8_t* encoderAccelCRC(DonneeAccelCRC* donnee)
     return tamponEncodage;
 }
 
-void* decoderMessage(uint8_t* message, uint8_t taille, const uint8_t typeAttendu)
+void* decoderMessage(uint8_t* message, uint8_t taille, uint8_t *typeDecode)
 {
     uint8_t header;
     assert(taille < TAILLE_TAMPON_DECODAGE);
     cobsDecode(message, taille, tamponDecodage);
-    if(typeAttendu == tamponDecodage[0])
+    header = tamponDecodage[0];
+
+    switch(header)
     {
-        return (void*)tamponDecodage;
+        case MESSAGE_ACCEL:
+        {
+            *typeDecode = MESSAGE_ACCEL;
+            return tamponDecodage;
+            break;
+        }
+        default:
+            break;
     }
     return NULL;
 }
+

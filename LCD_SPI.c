@@ -8,7 +8,6 @@
 
 #include "LCD_SPI.h"
 
-
  unsigned char spi_Send_Read(unsigned char byte)
  {
      SSP2BUF = byte;    
@@ -70,6 +69,7 @@
    
  }
  
+ 
  unsigned char readBusyFlag()
  {
         unsigned char retValue;
@@ -125,3 +125,69 @@
      __delay_ms(33); //wait 100 ms for the LCD to power itself on properly
      __delay_ms(33); //wait 100 ms for the LCD to power itself on properly
  }
+
+ char fliplr(char input)
+ {
+     //Flips the char so it becomes LSB first
+    input = (input & 0xF0) >> 4 | (input & 0x0F) << 4;
+    input = (input & 0xCC) >> 2 | (input & 0x33) << 2;
+    input = (input & 0xAA) >> 1 | (input & 0x55) << 1;
+    
+    return input;
+ }
+ void moveCursor(int row, int col)
+ {
+    char address = row * 20 + col;
+    if (row >= 2)
+    {
+        address += 24;
+    }
+    address = fliplr(address);
+    while(readBusyFlag());
+    SPI_CS = 0;
+    spi_Send_Read(0xF8); // Send 5-bit start then 000
+    spi_Send_Read(address & 0xF0); 
+    spi_Send_Read((address << 4) | 0x10); // D7 = 1, for Set DDRAM address command
+ }
+ 
+ void clearRow(int row)
+{
+    moveCursor(row,0);
+    putStringLCD("                    ");
+}
+
+void putNumberLCD(int number)
+{
+    int signe = 0;
+    int i = 0;
+    int diviseur = 10000;
+    int chiffreAffichage = 0;
+    char stringAffichage[2];
+    int begin = 0;
+    
+    signe = number&0x8000;
+    
+    if (signe)
+    {
+        number ^= 0xFFFF;
+        number += 1;
+        putStringLCD("-");
+    }
+    
+    for(i =0;i<5;i++)
+    {
+        chiffreAffichage =0;
+        chiffreAffichage = number/diviseur;
+        number = number-(diviseur*chiffreAffichage);
+        diviseur = diviseur/10;
+        if (chiffreAffichage>0 || begin)
+        {
+            begin =1;
+            chiffreAffichage += 48;
+            stringAffichage[0] = (char)chiffreAffichage;
+            stringAffichage[1] = '\0';
+            putStringLCD(stringAffichage);
+        }
+    }
+    
+}

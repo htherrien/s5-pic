@@ -13,8 +13,6 @@ void InitialisationIO(void)
     ANCON2bits.ANSEL14 = 0; // La pin est une entree digital
     ANCON2bits.ANSEL15 = 0; // La pin est une entree digital
     
-    //LATGbits.LATG3 = 0; // initialise a 0
-    //LATGbits.LATG4 = 0; // initialise a 0
     
     //Configuration des outputs
     TRISCbits.TRISC6 = 0; //Initialise la pin SG3 du port E en output (DEL vert))

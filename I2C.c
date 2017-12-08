@@ -24,6 +24,25 @@ uint8_t I2CInitialisation(void)
    return valeur;
 
 }
+
+void InitialisationIntI2C(void)
+{
+    // Initialise l'interuption qui indicte au compilateur qu'il faut faire une lecture I2C
+    
+    // Initialisation de l'horloge Timer0 
+    TMR0L = 0xFF;		//chargement du compte LSB
+    TMR0H = 0xFF;		//chargement du compte MSB
+    T0CON = 0xD1;         //PRESCALER VALUE: Sert à initialiser la fréquence d'échantillonnage 
+    T0CONbits.TMR0ON=1;    // mise en route de l'horloge
+
+    // initialisation des interruptions
+    INTCONbits.TMR0IF = 0; // Descend le flag TMR0
+    INTCONbits.TMR0IE = 1; // Enable 
+    INTCONbits.GIE = 1;
+    PIE2bits.BCL1IE = 1;
+    //RCON = RCON | 0x80;
+    
+}
 uint8_t WHOAMI(void)
 {
 
@@ -37,26 +56,30 @@ uint8_t WHOAMI(void)
     //START CONDITION
     StartI2C();
     
-    //Address in writing mode
-    WriteI2C(CapteurWriteAddress);
+      do{
+        
+       WriteI2C(CapteurWriteAddress);
+    
+     }while(SSP1CON2bits.ACKSTAT);
+    
     
     //Wait for acknowledge from slave
-    while(SSP1CON2bits.ACKSTAT); //Bit 6 (I2C_V4 routine does not ackn.
+    do{
+        
+        WriteI2C(capteurWhoAmIreg);
     
-    // Address register to read
-    WriteI2C(capteurWhoAmIreg);
+     }while(SSP1CON2bits.ACKSTAT);
     
-    //Wait for acknowledge from slave
-    while(SSP1CON2bits.ACKSTAT);
     
     //START CONDITION
     StartI2C();
     
-    //Address of slave in read mode
-    WriteI2C(CapteurReadAddress);
-    
+ 
     //Wait for acknowledge from slave
-    while(SSP1CON2bits.ACKSTAT);
+    do{
+    WriteI2C(CapteurReadAddress);
+    }while(SSP1CON2bits.ACKSTAT);
+    
     
     //Read data from slave
     donnee_x1 = getcI2C();

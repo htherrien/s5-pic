@@ -44,6 +44,10 @@ void putchLCD(unsigned char);
 void clearDisplay();
 void displayCtrl(char display, char cursor, char blink);
  void initialisation_PORT(void);
+ void moveCursor(int row, int col);
+char fliplr(char input);
+void clearRow(int row);
+void putNumberLCD(int number);
 
  // Defines
  #define SPI_SCK        LATDbits.LATD2        // Clock pin, PORTD pin 2 

@@ -19,22 +19,26 @@ Propri√©t√© : Les S de Sherbrooke
 #include "IO.h"
  
 //Defines
-#define trameEnvoyeDSK 0xAA // Variable contenant la valeur de la tramme envoye au DSK
+//#define trameEnvoyeDSK 0xAA // Variable contenant la valeur de la tramme envoye au DSK
 
 //Variables globale
-char ValeurReussi = 0x69; // Valeur qui indique q'une correlation a ete reussite
+//char ValeurReussi = 0x69; // Valeur qui indique q'une correlation a ete reussite
 int readI2C_flag = 0; // Flag qui indique de commencer une lecture I2C
+int resultat_corr = 0;
 int donneeDSK_ready = 0; // Flag indiquant qu'une donnee venant du DSK a ete lue
 unsigned char trameRecue_DSK = 0; // Trame recue du DSK;
 int modeCorrelation = 0;    // Active le mode Correlation
-
+int modeCorrelationAffichage = 0;    // Active l'affichage pour la correlation
+int modeCurseurAffichage = 0;        // Active l'affichage pour la curseur
+int pauseFlag = 0;    // Active l'affichage
+int reussi=0;
 
  void main(void)
  {
      //Fonctions d'initialisation
      initialisation_SPI();      // Initialisation SPI
      initialisation_PORT();     // Initialisation PORTs
-     I2CInitialisation();       // Initialisation I2C
+     reussi=I2CInitialisation();       // Initialisation I2C
      ComputeTableCRC8();
      InitialisationIntI2C();    // Initialisation interrup I2C
      configPIC_DSK();           // configuration UART
@@ -43,58 +47,104 @@ int modeCorrelation = 0;    // Active le mode Correlation
     while(readBusyFlag());
     clearDisplay();
     displayCtrl(1,1,0);
+	moveCursor(1,2);
     putStringLCD("Bonjour");
     InitialisationIO();         // Initialisation I/O PORTs
     
     while (1)
     {    
-        if(PORTGbits.RG4==1)    //switch fermÈe
+        if(PORTGbits.RG4==1)    //switch fermÍ•ç
         {
+             if(pauseFlag == 1)
+             {
+            while(readBusyFlag());
+            clearDisplay();
+            moveCursor(1,2);
+            putStringLCD("Pause");     // LCD affiche le mode pause
+             }
+            pauseFlag = 0;
+            modeCurseurAffichage = 0;
+            modeCorrelationAffichage = 0;
             LATCbits.LATC6 = 0;  //Close LED Verte
             LATCbits.LATC5 = 0;  //Close LED Rouge
             LATCbits.LATC2 = 0;  //Close LED jaune
-            while(readBusyFlag());
-            clearDisplay();
-            putStringLCD("Pause");     // LCD affiche le mode pause
         } 
         else
         {
+            pauseFlag = 1;
             LATCbits.LATC6 = 1;  //Open LED Verte
-            
-        //SECTION COMMUNICATION INPUT DSK
-            if(donneeDSK_ready)
-            {
-                if(ValeurReussi == trameRecue_DSK && modeCorrelation == 1)
-                {
-                    LATCbits.LATC5 = 0;  //Close LED Rouge
-                    LATCbits.LATC2 = 1;  //Open LED jaune
-                    trameRecue_DSK = 0;  //PrÍt pour une autre trame
-                }
-                 /*if(ValeurReussi != trameRecue_DSK && modeCorrelation == 1)
-                {
-                    flag_corrRate = 1;
-                    LATCbits.LATC5 = 1;  //Open LED Rouge
-                    LATCbits.LATC2 = 0;  //Close LED jaune
-                }*/
-            }
         
         //SECTION COMMUNICATION OUTPUT DSK
             if(PORTGbits.RG3==0)     //bouton
             {
-                while(readBusyFlag());
-                clearDisplay();
-                putStringLCD("Mode Correlation");   // LCD affiche le mode
-                modeCorrelation = 1;                // Mode Correlation activÈ
+                if(modeCorrelationAffichage == 0)
+                {
+                    modeCorrelationAffichage = 1;
+                    while(readBusyFlag());
+                    clearDisplay();
+                    putStringLCD("Mode Correlation");   // LCD affiche le mode
+                    
+/************************************************************/   
+/*                    AFFICHAGE R ìULTAT                    */                                       
+/************************************************************/ 
+                   if(resultat_corr < 90 || resultat_corr > 100)
+                   {
+                      
+                      moveCursor(1,1);
+                      putStringLCD("similarite:");
+                      moveCursor(1,13);
+                      if(resultat_corr < 1 || resultat_corr > 100)
+                      {
+                        putStringLCD("0%");  
+                      }
+                      else
+                      {
+                      putNumberLCD(resultat_corr);
+                      putStringLCD("%");
+                      }
+                      moveCursor(2,1);
+                      clearRow(2);
+                      putStringLCD("Mouvement inconnu");  
+                      
+                   }
+                   else 
+                   {
+                      moveCursor(1,1);
+                      putStringLCD("similarite:");
+                      moveCursor(1,13);
+                      putNumberLCD(resultat_corr);
+                      putStringLCD("%");
+                      moveCursor(2,1);
+                      clearRow(2);
+                      putStringLCD("Mouvement reussi");  
+                   }
+/************************************************************/   
+/*                 FIN AFFICHAGE R ìULTAT                   */                                       
+/************************************************************/ 
+                    
+                }
+                modeCorrelation = 1;                // Mode Correlation activÈçä
+                modeCurseurAffichage = 0;
+                //SECTION COMMUNICATION INPUT DSK
+                LATCbits.LATC5 = 0;  //Close LED Rouge
+                LATCbits.LATC2 = 1;  //Open LED jaune
+                trameRecue_DSK = 0;  //PrÎ¥†pour une autre trame
             }  
             if(PORTGbits.RG3==1)     //bouton
             {
-                while(readBusyFlag());
-                clearDisplay();
-                putStringLCD("Mode Curseur");   // LCD affiche le mode       
-                modeCorrelation = 0;            // Mode Curseur activÈ
+                if(modeCurseurAffichage == 0)
+                {
+                    while(readBusyFlag());
+                    clearDisplay();
+                    moveCursor(1,2);
+                    putStringLCD("Mode Curseur");   // LCD affiche le mode
+                    modeCurseurAffichage = 1;
+                }
+                modeCorrelationAffichage = 0;
+                modeCorrelation = 0;            // Mode Curseur activÈçä
                 LATCbits.LATC5 = 1;  //Open LED Rouge
                 LATCbits.LATC2 = 0;  //Close LED jaune
-            }  
+            }   
                
             //SECTION LECTURE MPU6050
             if(readI2C_flag)
@@ -107,6 +157,14 @@ int modeCorrelation = 0;    // Active le mode Correlation
                 donnee.x = ((uint16_t)buf[0] << 8) + buf[1];
                 donnee.y = ((uint16_t)buf[2] << 8) + buf[3];
                 donnee.z = ((uint16_t)buf[4] << 8) + buf[5];
+                if(modeCorrelation)
+                {
+                    donnee.mode = MODE_CORRELATION;
+                }
+                else
+                {
+                    donnee.mode = MODE_SOURIS;
+                }
 
                 tamponEnvoiPtr = encoderAccel(&donnee);
                 ecrireMessageUART(tamponEnvoiPtr);
@@ -118,18 +176,36 @@ int modeCorrelation = 0;    // Active le mode Correlation
          
 
  
- void interrupt myIsr(void)
+ void interrupt low_priority myIsr(void)
 {
+     if(PIR2bits.BCL1IF == 1)   {
+            while(readBusyFlag());
+           clearDisplay();
+           putStringLCD("BUGGE");   // LCD affiche le mode
+           while(1){AckI2C();}
+        }
      if(PIR1bits.RC1IF == 1) // Bit de flag indiquant que le buffer de reception UART est plein
      {
          trameRecue_DSK = lectureCharUART();
+		 resultat_corr = trameRecue_DSK;
          donneeDSK_ready = 1; // Donnee du DSK lue
      }
+     
      if(INTCONbits.TMR0IE && INTCONbits.TMR0IF) 
      { 
         INTCONbits.TMR0IF = 0; // remise ‡ zero du flag interne d'interruption
         readI2C_flag = 1; // On leve le flag readI2C_flag pour que les donnees I2C soient lue dans le main
      }
+     
 }
  
+ /*void interrupt high_priority isr(void)
+ {
+    if(PIR2bits.BCL1IF == 1)   {
+            while(readBusyFlag());
+           clearDisplay();
+           putStringLCD("BUGGE");   // LCD affiche le mode
+           while(1){}
+        }
+ }*/
 
